@@ -1,34 +1,36 @@
 import { Express, Request, Response } from 'express';
-import { AppDataSource } from '../database';
-import { Room } from '../entity/Room';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
-export const UseRoomRoutes = (app: Express) => {
+export const UseRoomRoutes = (app: Express, prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) => {
 
     app.get("/rooms", async (req: Request, res: Response) => {
-        const rooms = await AppDataSource.getRepository(Room).find();
+        const rooms = await prisma.room.findMany();
         res.status(200).json(rooms);
     })
 
     app.post('/rooms', async (req: Request, res: Response) => {
-        const r2 = AppDataSource.getRepository(Room).create(req.body as Room);
-        await AppDataSource.getRepository(Room).save(r2);
-        res.status(201).json(r2);
+        const room = await prisma.room.create({
+            data: req.body
+        });
+        res.status(201).json(room);
     });
 
     app.get('/rooms/:id', async (req: Request, res: Response) => {
-        const room = await AppDataSource.getRepository(Room).findOneBy({ id: req.params.id })
+        const room = prisma.room.findFirst({ where: { id: req.params.id } })
         res.json(room);
     });
 
     app.put('/rooms/:id', async (req: Request, res: Response) => {
-        const room = await AppDataSource.getRepository(Room).findOneBy({ id: req.params.id })
-        AppDataSource.getRepository(Room).merge(room!, req.body)
-        const updateRoom = await AppDataSource.getRepository(Room).save(room!);
-        res.status(201).json(updateRoom);
+        const updatedRoom = await prisma.room.update({
+            where: { id: req.params.id },
+            data: req.body
+        });
+        res.json(updatedRoom);
     });
-    
+
     app.delete('/rooms/:id', async (req: Request, res: Response) => {
-        const delRoom = await AppDataSource.getRepository(Room).delete(req.params.id);
+        const delRoom = await prisma.room.delete({ where: { id: req.params.id } })
         res.status(201).json(delRoom);
     });
 
