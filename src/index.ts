@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import { InitDatabase } from './database';
 import { UseRoomRoutes } from './routes/RoomRoutes';
+import 'dotenv/config'; 
 
 const app = express();
 const port = 3000;
@@ -18,7 +19,8 @@ UseRoomRoutes(app);
 // Starte den Server
 app.listen(port, async () => {
   await InitDatabase(); 
-  console.log(`Server läuft unter http://localhost:${port}`);
+  console.log(process.env.NODE_ENV); 
+  console.log(`Server läuft unter http://localhost:${process.env.PORT}`);
 });
 
 
