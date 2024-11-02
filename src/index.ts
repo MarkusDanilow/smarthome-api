@@ -1,22 +1,28 @@
 import express, { Request, Response } from 'express';
 import { UseRoomRoutes } from './routes/RoomRoutes';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { UseSensorDataRoutes } from './routes/SensorDataRoutes';
+import apiKeyMiddleware from './middleware/auth';
 
 const app = express();
 const port = 3000;
+
+dotenv.config();
 
 app.use(express.json());
 
 const prisma = new PrismaClient();
 
-// Beispiel-Route: GET
+app.use(apiKeyMiddleware);
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Willkommen bei deiner Express-API!');
 });
 
 
 UseRoomRoutes(app, prisma);
+UseSensorDataRoutes(app, prisma); 
 
 // Starte den Server
 app.listen(port, async () => {
