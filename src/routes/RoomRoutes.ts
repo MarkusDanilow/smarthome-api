@@ -17,7 +17,7 @@ export const UseRoomRoutes = (app: Express, prisma: PrismaClient<Prisma.PrismaCl
     });
 
     app.get('/rooms/:id', async (req: Request, res: Response) => {
-        const room = prisma.room.findFirst({ where: { id: req.params.id } })
+        const room = await prisma.room.findFirst({ where: { id: req.params.id } })
         res.json(room);
     });
 
